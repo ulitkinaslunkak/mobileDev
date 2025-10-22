@@ -1,75 +1,85 @@
 package ru.mirea.lyulcheva.tripmate.presentation;
-import ru.mirea.lyulcheva.data.repository.NetworkTripRepository;
-import ru.mirea.lyulcheva.tripmate.R;
-import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.widget.TextView;
-import java.lang.StringBuilder;
 
-import ru.mirea.lyulcheva.data.repository.TripRepositoryImpl;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+
+import ru.mirea.lyulcheva.tripmate.R;
 import ru.mirea.lyulcheva.domain.models.Trip;
-import ru.mirea.lyulcheva.domain.usecases.*;
-
-import ru.mirea.lyulcheva.data.repository.ClientPreferencesRepository;
-import ru.mirea.lyulcheva.data.repository.RoomTripRepository;
-import ru.mirea.lyulcheva.data.local.*;
-import ru.mirea.lyulcheva.data.network.*;
-
 
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    private MainViewModel viewModel;
+    private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        TextView textView = findViewById(R.id.textView);
+        textView = findViewById(R.id.textView);
 
-        TripRepositoryImpl repository = new TripRepositoryImpl();
-        GetTripsUseCase getTrips = new GetTripsUseCase(repository);
-        AddTripUseCase addTrip = new AddTripUseCase(repository);
-        AddTripsToFavouriteByIdUseCase addToFav = new AddTripsToFavouriteByIdUseCase(repository);
-        GetFavouriteTripsByPageUseCase favByPage = new GetFavouriteTripsByPageUseCase(repository);
+        viewModel = new ViewModelProvider(this, new ViewModelProvider.Factory() {
+            @Override
+            public <T extends ViewModel> T create(Class<T> modelClass) {
+                return (T) new MainViewModel(getApplicationContext());
+            }
+        }).get(MainViewModel.class);
 
-        addTrip.execute(new Trip(4, "Казань - Сочи"));
-        addToFav.execute(2);
+        viewModel.getTrips().observe(this, this::updateTrips);
+        viewModel.getFavouriteTrips().observe(this, this::updateFavouriteTrips);
+//        viewModel.getRoomTrips().observe(this, this::updateRoomTrips);
+//        viewModel.getNetworkTrips().observe(this, this::updateNetworkTrips);
+        viewModel.getCombinedTrips().observe(this, this::updateCombinedTrips);
+        viewModel.getStatus().observe(this, status -> textView.append("\n" + status));
 
-        ClientPreferencesRepository prefs = new ClientPreferencesRepository(this);
-        prefs.saveClient("Иван", "ivan@mail.ru");
+        viewModel.loadTrips();
+        viewModel.loadFavouriteTrips(1, 2);
+        viewModel.loadRoomTrips();
+        viewModel.loadNetworkTrips();
 
-        RoomTripRepository roomRepo = new RoomTripRepository(this);
-        roomRepo.addTrip("Москва – Сочи");
-        roomRepo.addTrip("Казань – Уфа");
+        viewModel.addTrip(new Trip(4, "Казань – Сочи"));
+        viewModel.addTripToFavourite(2);
+        viewModel.saveClient("Иван", "ivan@mail.ru");
+        //viewModel.addRoomTrip("Москва – Сочи");
+        //viewModel.addRoomTrip("Казань – Уфа");
+    }
 
-        NetworkTripRepository netRepo = new NetworkTripRepository();
+    private void updateTrips(List<Trip> trips) {
+        textView.append("\nВсе поездки (UseCase):\n");
+        for (Trip trip : trips) textView.append(trip.getId() + ": " + trip.getName() + "\n");
+    }
 
-        StringBuilder sb = new StringBuilder();
+    private void updateFavouriteTrips(List<Trip> favourites) {
+        textView.append("\nИзбранные поездки (UseCase):\n");
+        for (Trip trip : favourites) textView.append(trip.getId() + ": " + trip.getName() + "\n");
+    }
 
-        sb.append("Все поездки (UseCase):\n");
-        for (Trip trip : getTrips.execute()) {
-            sb.append(trip.getId()).append(": ").append(trip.getName()).append("\n");
+//    private void updateRoomTrips(List<TripEntity> roomTrips) {
+//        textView.append("\nПоездки из Room:\n");
+//        for (TripEntity trip : roomTrips) textView.append(trip.id + ": " + trip.name + "\n");
+//    }
+
+//    private void updateNetworkTrips(@NonNull List<Trip> networkTrips) {
+//        textView.append("\nДанные с NetworkApi:\n");
+//        for (Trip trip : networkTrips) textView.append(trip.getId() + ": " + trip.getName() + "\n");
+//    }
+
+    private boolean combinedDisplayed = false;
+
+    private void updateCombinedTrips(List<Trip> combined) {
+        if (combinedDisplayed) return;
+        combinedDisplayed = true;
+
+        textView.append("\nОбъединённые Room + Network:\n");
+        for (Trip trip : combined) {
+            textView.append(trip.getId() + ": " + trip.getName() + "\n");
         }
-
-        List<Trip> favourites = favByPage.execute(1, 2);
-        sb.append("\nИзбранные поездки (UseCase):\n");
-        for (Trip fav : favourites) {
-            sb.append(fav.getId()).append(": ").append(fav.getName()).append("\n");
-        }
-
-        List<TripEntity> roomTrips = roomRepo.getAllTrips();
-        sb.append("\nПоездки из Room:\n");
-        for (TripEntity trip : roomTrips) {
-            sb.append(trip.id).append(": ").append(trip.name).append("\n");
-        }
-
-        List<Trip> networkTrips = netRepo.fetchTrips();
-        sb.append("\nДанные с NetworkApi:\n");
-        for (Trip trip : networkTrips) {
-            sb.append(trip.getId()).append(": ").append(trip.getName()).append("\n");
-        }
-
-        textView.setText(sb.toString());
     }
 }
+
