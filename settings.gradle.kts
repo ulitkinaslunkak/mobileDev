@@ -25,3 +25,6 @@ include(":data")
 include(":domain")
 
 include(":app", ":data", ":domain")
+include(":ScrollViewActivity")
+include(":ListViewApp")
+include(":RecyclerViewApp")

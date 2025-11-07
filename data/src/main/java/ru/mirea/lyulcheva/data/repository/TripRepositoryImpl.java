@@ -11,9 +11,10 @@ public class TripRepositoryImpl implements TripRepository {
     private final List<Trip> trips = new ArrayList<>();
 
     public TripRepositoryImpl() {
-        trips.add(new Trip(1, "Москва - Санкт-Петербург"));
-        trips.add(new Trip(2, "Берлин - Париж"));
-        trips.add(new Trip(3, "Нью-Йорк - Лос-Анджелес"));
+        trips.add(new Trip(1, "Москва - Санкт-Петербург", "Поездка по железной дороге", "moscow_spb"));
+        trips.add(new Trip(2, "Берлин - Париж", "Европейское приключение", "berlin_paris"));
+        trips.add(new Trip(3, "Нью-Йорк - Лос-Анджелес", "Путешествие по США", "ny_la"));
+        trips.add(new Trip(4, "Казань - Сочи", "От Волги до Чёрного моря", "kazan_sochi"));
     }
 
     @Override

@@ -3,27 +3,22 @@ package ru.mirea.lyulcheva.domain.models;
 public class Trip {
     private int id;
     private String name;
-    private boolean isFavourite;
+    private String description;
+    private String imageName;
 
-    public Trip(int id, String name) {
+    private boolean favourite = false;
+
+    public Trip(int id, String name, String description, String imageName) {
         this.id = id;
         this.name = name;
-        this.isFavourite = false;
+        this.description = description;
+        this.imageName = imageName;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public boolean isFavourite() {
-        return isFavourite;
-    }
-
-    public void setFavourite(boolean favourite) {
-        isFavourite = favourite;
-    }
+    public int getId() { return id; }
+    public String getName() { return name; }
+    public String getDescription() { return description; }
+    public String getImageName() { return imageName; }
+    public boolean isFavourite() { return favourite; }
+    public void setFavourite(boolean favourite) { this.favourite = favourite; }
 }

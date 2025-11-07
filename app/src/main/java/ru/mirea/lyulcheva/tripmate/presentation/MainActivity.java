@@ -11,75 +11,39 @@ import ru.mirea.lyulcheva.tripmate.R;
 import ru.mirea.lyulcheva.domain.models.Trip;
 
 import java.util.List;
+import androidx.recyclerview.widget.RecyclerView;
+import java.util.ArrayList;
+import ru.mirea.lyulcheva.tripmate.presentation.adapter.TripAdapter;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
+import ru.mirea.lyulcheva.tripmate.presentation.MainViewModel;
 
 public class MainActivity extends AppCompatActivity {
 
+    private TripAdapter adapter;
     private MainViewModel viewModel;
-    private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        textView = findViewById(R.id.textView);
+        RecyclerView recycler = findViewById(R.id.mockRecycler);
+        recycler.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new TripAdapter(new ArrayList<>());
+        recycler.setAdapter(adapter);
 
         viewModel = new ViewModelProvider(this, new ViewModelProvider.Factory() {
+            @NonNull
             @Override
-            public <T extends ViewModel> T create(Class<T> modelClass) {
+            @SuppressWarnings("unchecked")
+            public <T extends androidx.lifecycle.ViewModel> T create(@NonNull Class<T> modelClass) {
                 return (T) new MainViewModel(getApplicationContext());
             }
         }).get(MainViewModel.class);
 
-        viewModel.getTrips().observe(this, this::updateTrips);
-        viewModel.getFavouriteTrips().observe(this, this::updateFavouriteTrips);
-//        viewModel.getRoomTrips().observe(this, this::updateRoomTrips);
-//        viewModel.getNetworkTrips().observe(this, this::updateNetworkTrips);
-        viewModel.getCombinedTrips().observe(this, this::updateCombinedTrips);
-        viewModel.getStatus().observe(this, status -> textView.append("\n" + status));
-
-        viewModel.loadTrips();
-        viewModel.loadFavouriteTrips(1, 2);
-        viewModel.loadRoomTrips();
-        viewModel.loadNetworkTrips();
-
-        viewModel.addTrip(new Trip(4, "Казань – Сочи"));
-        viewModel.addTripToFavourite(2);
-        viewModel.saveClient("Иван", "ivan@mail.ru");
-        //viewModel.addRoomTrip("Москва – Сочи");
-        //viewModel.addRoomTrip("Казань – Уфа");
-    }
-
-    private void updateTrips(List<Trip> trips) {
-        textView.append("\nВсе поездки (UseCase):\n");
-        for (Trip trip : trips) textView.append(trip.getId() + ": " + trip.getName() + "\n");
-    }
-
-    private void updateFavouriteTrips(List<Trip> favourites) {
-        textView.append("\nИзбранные поездки (UseCase):\n");
-        for (Trip trip : favourites) textView.append(trip.getId() + ": " + trip.getName() + "\n");
-    }
-
-//    private void updateRoomTrips(List<TripEntity> roomTrips) {
-//        textView.append("\nПоездки из Room:\n");
-//        for (TripEntity trip : roomTrips) textView.append(trip.id + ": " + trip.name + "\n");
-//    }
-
-//    private void updateNetworkTrips(@NonNull List<Trip> networkTrips) {
-//        textView.append("\nДанные с NetworkApi:\n");
-//        for (Trip trip : networkTrips) textView.append(trip.getId() + ": " + trip.getName() + "\n");
-//    }
-
-    private boolean combinedDisplayed = false;
-
-    private void updateCombinedTrips(List<Trip> combined) {
-        if (combinedDisplayed) return;
-        combinedDisplayed = true;
-
-        textView.append("\nОбъединённые Room + Network:\n");
-        for (Trip trip : combined) {
-            textView.append(trip.getId() + ": " + trip.getName() + "\n");
-        }
+        viewModel.getMockTrips().observe(this, trips -> adapter.updateData(trips));
+        viewModel.loadMockTrips();
     }
 }
-

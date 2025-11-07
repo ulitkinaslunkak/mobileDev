@@ -9,9 +9,9 @@ public class NetworkApi {
 
     public List<Trip> getTrips() {
         return Arrays.asList(
-                new Trip(1, "Москва – Питер"),
-                new Trip(2, "Казань – Сочи"),
-                new Trip(3, "Омск – Байкал")
+                //new Trip(1, "Москва – Питер"),
+                //new Trip(2, "Казань – Сочи"),
+                //new Trip(3, "Омск – Байкал")
         );
     }
 }
