@@ -16,8 +16,11 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        jcenter()
     }
 }
+
+
 
 rootProject.name = "My Application"
 include(":app")
@@ -28,3 +31,6 @@ include(":app", ":data", ":domain")
 include(":ScrollViewActivity")
 include(":ListViewApp")
 include(":RecyclerViewApp")
+include(":retrofitapp")
+include(":retrofitapp2")
+include(":fragmentapp")

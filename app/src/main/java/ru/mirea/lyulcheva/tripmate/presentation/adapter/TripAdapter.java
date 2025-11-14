@@ -3,56 +3,65 @@ package ru.mirea.lyulcheva.tripmate.presentation.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.squareup.picasso.Picasso;
 import java.util.List;
 import ru.mirea.lyulcheva.tripmate.R;
 import ru.mirea.lyulcheva.domain.models.Trip;
-import android.widget.ImageView;
-public class TripAdapter extends RecyclerView.Adapter<TripAdapter.ViewHolder> {
+
+public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder> {
 
     private List<Trip> trips;
 
-    public TripAdapter(List<Trip> trips) { this.trips = trips; }
+    public TripAdapter(List<Trip> trips) {
+        this.trips = trips;
+    }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_trip, parent, false);
-        return new ViewHolder(view);
+    public TripViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_trip, parent, false);
+        return new TripViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull TripViewHolder holder, int position) {
         Trip trip = trips.get(position);
-        holder.tripName.setText(trip.getName());
-        holder.tripDescription.setText(trip.getDescription());
+        holder.name.setText(trip.getName());
+        holder.description.setText(trip.getDescription());
 
-        int resId = holder.itemView.getContext().getResources()
-                .getIdentifier(trip.getImageName(), "drawable", holder.itemView.getContext().getPackageName());
-        holder.tripIcon.setImageResource(resId != 0 ? resId : R.drawable.ic_trip);
+        Picasso.get()
+                .load(trip.getImageName()) // теперь это URL
+                .placeholder(R.drawable.placeholder)
+                .error(R.drawable.error_image)
+                .into(holder.image);
     }
 
     @Override
-    public int getItemCount() { return trips.size(); }
-
-    static class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView tripIcon;
-        TextView tripName, tripDescription;
-
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            tripIcon = itemView.findViewById(R.id.tripIcon);
-            tripName = itemView.findViewById(R.id.tripName);
-            tripDescription = itemView.findViewById(R.id.tripDescription);
-        }
+    public int getItemCount() {
+        return trips.size();
     }
 
     public void updateData(List<Trip> newTrips) {
-        this.trips = newTrips;
+        trips.clear();
+        trips.addAll(newTrips);
         notifyDataSetChanged();
     }
+
+    static class TripViewHolder extends RecyclerView.ViewHolder {
+        TextView name, description;
+        ImageView image;
+
+        public TripViewHolder(@NonNull View itemView) {
+            super(itemView);
+            name = itemView.findViewById(R.id.trip_name);
+            description = itemView.findViewById(R.id.trip_description);
+            image = itemView.findViewById(R.id.trip_image);
+        }
+    }
 }
+
+

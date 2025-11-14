@@ -6,74 +6,64 @@ import ru.mirea.lyulcheva.domain.repository.TripRepository;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.util.Log;
+
+import retrofit2.Response;
+
+import ru.mirea.lyulcheva.data.network.ApiService;
+import ru.mirea.lyulcheva.data.network.RetrofitClient;
+
 public class TripRepositoryImpl implements TripRepository {
 
-    private final List<Trip> trips = new ArrayList<>();
+    private final ApiService apiService;
 
     public TripRepositoryImpl() {
-        trips.add(new Trip(1, "Москва - Санкт-Петербург", "Поездка по железной дороге", "moscow_spb"));
-        trips.add(new Trip(2, "Берлин - Париж", "Европейское приключение", "berlin_paris"));
-        trips.add(new Trip(3, "Нью-Йорк - Лос-Анджелес", "Путешествие по США", "ny_la"));
-        trips.add(new Trip(4, "Казань - Сочи", "От Волги до Чёрного моря", "kazan_sochi"));
+        apiService = RetrofitClient.getClient().create(ApiService.class);
     }
 
     @Override
     public List<Trip> getTrips() {
-        return new ArrayList<>(trips);
+        try {
+            Response<List<Trip>> response = apiService.getTrips().execute();
+            if (response.isSuccessful() && response.body() != null) {
+                return response.body();
+            } else {
+                Log.e("TripRepository", "Ошибка ответа: " + response.code());
+                return new ArrayList<>();
+            }
+        } catch (Exception e) {
+            Log.e("TripRepository", "Ошибка сети: " + e.getMessage());
+            return new ArrayList<>();
+        }
     }
 
     @Override
     public Trip getTripById(int id) {
-        for (Trip trip : trips) {
-            if (trip.getId() == id) {
-                return trip;
-            }
-        }
         return null;
     }
 
     @Override
     public boolean addTrip(Trip trip) {
-        return trips.add(trip);
+        return false;
     }
 
     @Override
-    public boolean editTrip(Trip updatedTrip) {
-        for (int i = 0; i < trips.size(); i++) {
-            if (trips.get(i).getId() == updatedTrip.getId()) {
-                trips.set(i, updatedTrip);
-                return true;
-            }
-        }
+    public boolean editTrip(Trip trip) {
         return false;
     }
 
     @Override
     public boolean deleteTrip(int id) {
-        return trips.removeIf(trip -> trip.getId() == id);
+        return false;
     }
 
     @Override
     public boolean addTripToFavourite(int id) {
-        Trip trip = getTripById(id);
-        if (trip != null) {
-            trip.setFavourite(true);
-            return true;
-        }
         return false;
     }
 
     @Override
     public List<Trip> getFavouriteTripsByPage(int page, int pageSize) {
-        List<Trip> favourites = new ArrayList<>();
-        for (Trip trip : trips) {
-            if (trip.isFavourite()) {
-                favourites.add(trip);
-            }
-        }
-        int fromIndex = (page - 1) * pageSize;
-        int toIndex = Math.min(fromIndex + pageSize, favourites.size());
-        if (fromIndex >= favourites.size()) return new ArrayList<>();
-        return favourites.subList(fromIndex, toIndex);
+        return new ArrayList<>();
     }
 }

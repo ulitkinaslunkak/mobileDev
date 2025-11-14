@@ -1,23 +1,16 @@
 package ru.mirea.lyulcheva.tripmate.presentation;
 
 import android.os.Bundle;
-import android.widget.TextView;
-
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import ru.mirea.lyulcheva.tripmate.R;
-import ru.mirea.lyulcheva.domain.models.Trip;
 
-import java.util.List;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import ru.mirea.lyulcheva.tripmate.presentation.adapter.TripAdapter;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
-
-import ru.mirea.lyulcheva.tripmate.presentation.MainViewModel;
 
 public class MainActivity extends AppCompatActivity {
 

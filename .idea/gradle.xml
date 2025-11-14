@@ -16,6 +16,9 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/data" />
             <option value="$PROJECT_DIR$/domain" />
+            <option value="$PROJECT_DIR$/fragmentapp" />
+            <option value="$PROJECT_DIR$/retrofitapp" />
+            <option value="$PROJECT_DIR$/retrofitapp2" />
           </set>
         </option>
       </GradleProjectSettings>
